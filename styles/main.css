@@ -70,14 +70,14 @@ html {
     grid-area: 4/1/4/3;
   }
 
-  #clear {
+  .clear {
     background-color: #ff5154;
     border-color: #b0353a;
     color: #fff;
     grid-area: 1/4/1/6;
   }
 
-    #clear:hover {
+    .clear:hover {
       background-color: #f17377;
     }
 
