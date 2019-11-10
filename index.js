@@ -55,8 +55,6 @@ function inputOperator(operatorValue) {
   calculator.operator = operatorValue;
 }
 
-// Split into functions that contain specific logic, ie one function for operator, one function for digit, etc
-// Split classes into types of buttons instead of using .calculator buttons, and then have querySelector select each of them to call appropriate functions
 const keys = document.querySelector('.calculator-buttons');
 keys.addEventListener('click', (event) => {
   console.log(event.target);
