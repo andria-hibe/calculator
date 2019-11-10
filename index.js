@@ -1,72 +1,65 @@
 const calculator = {
   value: "0",
-  firstOperand: null,
-  secondOperandReady: false,
+  firstNumber: null,
+  waitingForSecondNumber: false,
   operator: null
 }
 
-function updateDisplayValue() {
-  const display = document.querySelector('#display');
-  display.value = calculator.value;
-}
+const display = document.querySelector('#display');
+display.value = calculator.value;
 
-updateDisplayValue();
+const calculate = {
+  '+': (firstNumber, secondNumber) => firstNumber + secondNumber,
+  '-': (firstNumber, secondNumber) => firstNumber - secondNumber,
+  '*': (firstNumber, secondNumber) => firstNumber * secondNumber,
+  '/': (firstNumber, secondNumber) => firstNumber / secondNumber,
+};
 
 function clearCalculator(){
   calculator.value = '0';
-  calculator.firstOperand = null;
-  calculator.secondOperandReady = false;
+  calculator.firstNumber = null;
+  calculator.waitingForSecondNumber = false;
   calculator.operator = null;
 }
 
-function inputDigit(digit) {
-  const {value, secondOperandReady} = calculator;
+function inputNumber(number) {
+  const {value, waitingForSecondNumber} = calculator;
 
-  if (secondOperandReady === true) {
-    calculator.value = digit;
-    calculator.secondOperandReady = false;
+  if (waitingForSecondNumber) {
+    calculator.value = number;
+    calculator.waitingForSecondNumber = false;
   } else {
-    calculator.value = value === '0' ? digit : value + digit;
+    calculator.value = value === '0' ? number : value + number;
   }
 }
 
-function inputDecimal(decimal) {
-  if (!calculator.value.includes(decimal)) {
-    calculator.value += decimal;
-  }
-}
-
-function inputOperator(clickedOperator) {
-  const {value, firstOperand, operator} = calculator;
+function inputOperator(operatorValue) {
+  const {value, firstNumber, operator} = calculator;
   const inputValue = parseFloat(value);
 
-  if (operator && calculator.secondOperandReady)  {
-    calculator.operator = clickedOperator;
+  if (operator && calculator.waitingForSecondNumber)  {
+    calculator.operator = operatorValue;
     return;
   }
 
-  if (firstOperand === null) {
-    calculator.firstOperand = inputValue;
+  if (firstNumber === null) {
+    calculator.firstNumber = inputValue;
   } else if (operator) {
-    const calculation = calculate[operator](firstOperand, inputValue);
+    const calculation = calculate[operator](firstNumber, inputValue);
     
     calculator.value = String(calculation);
-    calculator.firstOperand = calculation;
+    calculator.firstNumber = calculation;
   }
 
-  calculator.secondOperandReady = true;
-  calculator.operator = clickedOperator;
+  calculator.waitingForSecondNumber = true;
+  calculator.operator = operatorValue;
 }
 
-const calculate = {
-  '+': (firstOperand, secondOperandReady) => firstOperand + secondOperandReady,
-  '-': (firstOperand, secondOperandReady) => firstOperand - secondOperandReady,
-  '*': (firstOperand, secondOperandReady) => firstOperand * secondOperandReady,
-  '/': (firstOperand, secondOperandReady) => firstOperand / secondOperandReady,
-};
-
+// Split into functions that contain specific logic, ie one function for operator, one function for digit, etc
+// Split classes into types of buttons instead of using .calculator buttons, and then have querySelector select each of them to call appropriate functions
 const keys = document.querySelector('.calculator-buttons');
 keys.addEventListener('click', (event) => {
+  console.log(event.target);
   const target = event.target;
 
   if (!target.matches('button')) {
@@ -75,22 +68,24 @@ keys.addEventListener('click', (event) => {
 
   if (target.classList.contains('operator')) {
     inputOperator(target.value);
-    updateDisplayValue();
+    display.value = calculator.value;
     return;
   }
   
   if (target.classList.contains('clear')) {
     clearCalculator();
-    updateDisplayValue();
+    display.value = calculator.value;
     return;
   }
 
   if (target.classList.contains('decimal')) {
-    inputDecimal(target.value);
-    updateDisplayValue();
+    if (!calculator.value.includes('.')) {
+      calculator.value += '.';
+      display.value = calculator.value;
+    }
     return;
   }
 
-  inputDigit(target.value);
-  updateDisplayValue();
+  inputNumber(target.value);
+  display.value = calculator.value;
 });
